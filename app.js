@@ -1,3 +1,4 @@
+
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -8,7 +9,12 @@ import hpp from "hpp";
 import * as path from "path";
 import router from "./routes/api.js";
 
-import { MONGODB_CONNECTION, MAX_JSON_SIZE, URL_ENCODE, PORT, WEB_CACHE, REQUEST_LIMIT_NUMBER, REQUEST_LIMIT_TIMEOUT } from "./app/config/config.js";
+
+
+import {
+    MONGODB_CONNECTION, MAX_JSON_SIZE, URL_ENCODE, PORT, WEB_CACHE, REQUEST_LIMIT_NUMBER, REQUEST_LIMIT_TIMEOUT
+    ,
+ } from "./app/config/config.js";
 
 
 const app = express();
@@ -19,6 +25,7 @@ app.use(hpp());
 app.use(cors());
 app.use(helmet());
 app.use(cookieParser());
+app.use(express.json());
 
 //Rate limit middleware
 
@@ -39,6 +46,24 @@ app.set('etag', WEB_CACHE)
   
 //set API Routes
 
+//Mongodb DB connection
+
+const connectDB =async () => {
+    try {
+        await mongoose.connect("mongodb://localhost:27017/userTestDB");
+        console.log("MongoDB connected successfully");
+    } catch (error) {
+        console.error("Error connecting to MongoDB:", error.message);
+        process.exit(1);
+        
+    }
+}
+
+
+
+
+
+
 app.use("/api", router);
 
 //Set Application Storage
@@ -47,10 +72,13 @@ app.use(express.static('storage'));
 
 //Run you Express server
 
-app.listen(PORT, () => {
+//
+app.listen(PORT, async () => {
    
-    console.log(`Server is running on port ${PORT}`);
 
+    console.log(`Server running at http://localhost:${PORT}`);
+     await
+        connectDB();
 });
 
 //connect to MongoDB
